@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>JLPT N5 Vocab Cards (Light)</title>
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --text:#12131a;
+      --muted:#5a6172;
+      --border:rgba(18,19,26,.12);
+      --shadow: 0 10px 28px rgba(18,19,26,.10);
+      --radius:20px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1000px 700px at 10% 0%, rgba(120,160,255,.22), transparent 55%),
+                  radial-gradient(1000px 700px at 90% 10%, rgba(120,255,210,.18), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      line-height:1.25;
+    }
+    header{
+      padding:28px 18px 10px;
+      max-width:1200px;
+      margin:0 auto;
+    }
+    h1{
+      margin:0;
+      font-size:22px;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .sub{
+      margin:8px 0 0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .toolbar{
+      max-width:1200px;
+      margin:0 auto;
+      padding:12px 18px 18px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .input, .btn{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.85);
+      color:var(--text);
+      border-radius:14px;
+      padding:12px 14px;
+      box-shadow: none;
+      outline: none;
+    }
+    .input{
+      flex: 1 1 280px;
+      min-width: 260px;
+      font-size:16px;
+    }
+    .btn{
+      cursor:pointer;
+      user-select:none;
+      font-weight:750;
+      transition: transform .04s ease, background .15s ease;
+      font-size:14px;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn:hover{ background: rgba(255,255,255,1); }
+
+    main{
+      max-width:1200px;
+      margin:0 auto;
+      padding:0 18px 34px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: repeat( auto-fit, minmax(300px, 1fr) );
+      gap:16px;
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.92));
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:18px 18px 16px;
+      position:relative;
+      overflow:hidden;
+      cursor:pointer;
+      text-align:left;
+    }
+    .card:focus{
+      outline:3px solid rgba(120,160,255,.45);
+      outline-offset:2px;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 12px;
+      border-radius:999px;
+      font-size:13px;
+      color:var(--muted);
+      border:1px solid var(--border);
+      background: rgba(18,19,26,.03);
+      font-weight:700;
+    }
+
+    /* BIG typography */
+    .kanjit{
+      margin:14px 0 10px;
+      font-size: 72px;     /* VERY BIG kanji */
+      font-weight:900;
+      letter-spacing: .5px;
+      line-height:1.05;
+    }
+    ruby{ ruby-position: over; }
+    rt{
+      font-size: 22px;    /* BIG furigana */
+      color: var(--muted);
+      font-weight: 800;
+      letter-spacing:.2px;
+    }
+    .romaji{
+      margin:0;
+      font-size:28px;     /* BIG romaji */
+      font-weight:900;
+      letter-spacing:.3px;
+      color:#202334;
+    }
+    .meaning{
+      margin:10px 0 0;
+      font-size:22px;     /* BIG meaning */
+      font-weight:800;
+      color:#2a2e42;
+    }
+    .hint{
+      margin:12px 0 0;
+      color:var(--muted);
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .footer{
+      max-width:1200px;
+      margin:0 auto;
+      padding:0 18px 18px;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
+      background: rgba(255,255,255,.95);
+      border:1px solid var(--border);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .18s ease, transform .18s ease;
+      font-size:13px;
+      font-weight:700;
+    }
+    .toast.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(-2px);
+    }
+    .empty{
+      padding:24px 0;
+      color:var(--muted);
+      font-size:14px;
+      font-weight:700;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>JLPT N5 Vocabulary Cards</h1>
+    <p class="sub">Click a card to flip (show/hide romaji + meaning). Search works on kanji, kana, romaji, and English.</p>
+  </header>
+
+  <div class="toolbar">
+    <input id="search" class="input" type="search" placeholder="Search: 私 / わたし / watashi / mother ..." autocomplete="off" />
+    <button id="reset" class="btn" type="button">Reset</button>
+    <button id="revealAll" class="btn" type="button">Reveal all</button>
+    <button id="hideAll" class="btn" type="button">Hide all</button>
+  </div>
+
+  <main>
+    <div id="grid" class="grid" aria-live="polite"></div>
+    <div id="empty" class="empty" style="display:none;">No matches. Your search is too narrow.</div>
+  </main>
+
+  <div class="footer">
+    Follow <strong> <a href="https://www.facebook.com/profile.php?id=61586097327580">NIICHI</a></strong>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const WORDS = [
+      { kanji: "私",  kana: "わたし", romaji: "watashi", meaning: "I, me" },
+      { kanji: "あなた", kana: "あなた", romaji: "anata", meaning: "you" },
+      { kanji: "友達", kana: "ともだち", romaji: "tomodachi", meaning: "friend" },
+      { kanji: "先生", kana: "せんせい", romaji: "sensei", meaning: "teacher" },
+      { kanji: "学生", kana: "がくせい", romaji: "gakusei", meaning: "student" },
+      { kanji: "会社員", kana: "かいしゃいん", romaji: "kaishain", meaning: "company employee" },
+      { kanji: "仕事", kana: "しごと", romaji: "shigoto", meaning: "work, job" },
+      { kanji: "家族", kana: "かぞく", romaji: "kazoku", meaning: "family" },
+      { kanji: "母", kana: "はは", romaji: "haha", meaning: "(my) mother" },
+      { kanji: "父", kana: "ちち", romaji: "chichi", meaning: "(my) father" },
+      { kanji: "お母さん", kana: "おかあさん", romaji: "okāsan", meaning: "mother (polite)" },
+      { kanji: "お父さん", kana: "おとうさん", romaji: "otōsan", meaning: "father (polite)" },
+    ];
+
+    const revealed = new Set();
+
+    const gridEl = document.getElementById("grid");
+    const emptyEl = document.getElementById("empty");
+    const searchEl = document.getElementById("search");
+    const toastEl = document.getElementById("toast");
+
+    function normalize(s){
+      return (s || "").toString().trim().toLowerCase();
+    }
+
+    function matches(word, q){
+      if(!q) return true;
+      const hay = [word.kanji, word.kana, word.romaji, word.meaning].join(" ").toLowerCase();
+      return hay.includes(q);
+    }
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function rubyFor(kanji, kana){
+      const hasKanji = /[\u4E00-\u9FFF]/.test(kanji);
+      if(!hasKanji || kanji === kana){
+        return `<span>${escapeHtml(kanji)}</span>`;
+      }
+      return `<ruby>${escapeHtml(kanji)}<rt>${escapeHtml(kana)}</rt></ruby>`;
+    }
+
+    function render(){
+      const q = normalize(searchEl.value);
+      const filtered = WORDS.map((w,i)=>({...w,i})).filter(x => matches(x, q));
+
+      gridEl.innerHTML = "";
+      emptyEl.style.display = filtered.length ? "none" : "block";
+
+      filtered.forEach(item => {
+        const isRevealed = revealed.has(item.i);
+
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "card";
+        card.setAttribute("aria-pressed", String(isRevealed));
+        card.setAttribute("title", "Click to flip");
+
+        card.innerHTML = `
+          <div class="pill">N5 • Tap to flip</div>
+          <div class="kanjit">${rubyFor(item.kanji, item.kana)}</div>
+          ${isRevealed ? `
+            <p class="romaji">${escapeHtml(item.romaji)}</p>
+            <p class="meaning">${escapeHtml(item.meaning)}</p>
+            <p class="hint">Click again to hide.</p>
+          ` : `
+            <p class="romaji" style="visibility:hidden;">placeholder</p>
+            <p class="meaning" style="visibility:hidden;">placeholder</p>
+            <p class="hint">Click to reveal romaji + meaning.</p>
+          `}
+        `;
+
+        card.addEventListener("click", () => {
+          if (revealed.has(item.i)) {
+            revealed.delete(item.i);
+            toast("Hidden");
+          } else {
+            revealed.add(item.i);
+            toast("Revealed");
+          }
+          render();
+        });
+
+        gridEl.appendChild(card);
+      });
+    }
+
+    let toastTimer = null;
+    function toast(msg){
+      clearTimeout(toastTimer);
+      toastEl.textContent = msg;
+      toastEl.classList.add("show");
+      toastTimer = setTimeout(() => toastEl.classList.remove("show"), 650);
+    }
+
+    document.getElementById("reset").addEventListener("click", () => {
+      searchEl.value = "";
+      revealed.clear();
+      toast("Reset");
+      render();
+      searchEl.focus();
+    });
+
+    document.getElementById("revealAll").addEventListener("click", () => {
+      WORDS.forEach((_, i) => revealed.add(i));
+      toast("All revealed");
+      render();
+    });
+
+    document.getElementById("hideAll").addEventListener("click", () => {
+      revealed.clear();
+      toast("All hidden");
+      render();
+    });
+
+    searchEl.addEventListener("input", render);
+    render();
+  </script>
+</body>
+</html>
