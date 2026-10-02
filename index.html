@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>JLPT N5 Vocab Cards (Light)</title>
+  <title>JLPT N5 Vocab Quiz</title>
   <style>
     :root{
       --bg:#f6f7fb;
@@ -11,327 +11,638 @@
       --text:#12131a;
       --muted:#5a6172;
       --border:rgba(18,19,26,.12);
-      --shadow: 0 10px 28px rgba(18,19,26,.10);
+      --shadow:0 10px 28px rgba(18,19,26,.10);
+      --accent:#4f6bff;
+      --accent-soft:rgba(79,107,255,.12);
+      --good:#16a34a;
+      --good-soft:rgba(22,163,74,.12);
+      --bad:#dc2626;
+      --bad-soft:rgba(220,38,38,.10);
       --radius:20px;
+      --glow1:rgba(120,160,255,.22);
+      --glow2:rgba(120,255,210,.18);
+    }
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg:#0f1117;
+        --card:#181b24;
+        --text:#eef0f6;
+        --muted:#9aa1b5;
+        --border:rgba(255,255,255,.10);
+        --shadow:0 10px 28px rgba(0,0,0,.35);
+        --accent:#7d93ff;
+        --accent-soft:rgba(125,147,255,.16);
+        --good:#4ade80;
+        --good-soft:rgba(74,222,128,.14);
+        --bad:#f87171;
+        --bad-soft:rgba(248,113,113,.14);
+        --glow1:rgba(90,120,255,.16);
+        --glow2:rgba(60,200,160,.10);
+      }
     }
     *{box-sizing:border-box}
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
-      background: radial-gradient(1000px 700px at 10% 0%, rgba(120,160,255,.22), transparent 55%),
-                  radial-gradient(1000px 700px at 90% 10%, rgba(120,255,210,.18), transparent 55%),
-                  var(--bg);
+      min-height:100vh;
+      font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans", "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+      background:radial-gradient(1000px 700px at 10% 0%, var(--glow1), transparent 55%),
+                 radial-gradient(1000px 700px at 90% 10%, var(--glow2), transparent 55%),
+                 var(--bg);
+      background-attachment:fixed;
       color:var(--text);
-      line-height:1.25;
+      line-height:1.3;
     }
-    header{
-      padding:28px 18px 10px;
-      max-width:1200px;
-      margin:0 auto;
-    }
-    h1{
-      margin:0;
-      font-size:22px;
-      font-weight:800;
-      letter-spacing:.2px;
-    }
-    .sub{
-      margin:8px 0 0;
-      color:var(--muted);
-      font-size:14px;
-    }
+    .wrap{ max-width:720px; margin:0 auto; padding:24px 16px 40px; }
 
-    .toolbar{
-      max-width:1200px;
-      margin:0 auto;
-      padding:12px 18px 18px;
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
+    header{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; }
+    .brand{ display:flex; align-items:center; gap:10px; }
+    .logo{
+      width:40px; height:40px; border-radius:12px; display:grid; place-items:center;
+      background:var(--accent); color:#fff; font-weight:900; font-size:20px;
     }
-    .input, .btn{
+    h1{ margin:0; font-size:20px; font-weight:850; letter-spacing:.2px; }
+    .sub{ margin:2px 0 0; color:var(--muted); font-size:13px; font-weight:600; }
+
+    .panel{
+      background:var(--card);
       border:1px solid var(--border);
-      background: rgba(255,255,255,.85);
-      color:var(--text);
-      border-radius:14px;
-      padding:12px 14px;
-      box-shadow: none;
-      outline: none;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:22px;
     }
-    .input{
-      flex: 1 1 280px;
-      min-width: 260px;
-      font-size:16px;
+    .hidden{ display:none !important; }
+
+    /* ---------- Setup ---------- */
+    .section-label{ margin:0 0 10px; font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+    .group{ margin-bottom:22px; }
+    .chips{ display:flex; flex-wrap:wrap; gap:8px; }
+    .chip{
+      border:1px solid var(--border); background:transparent; color:var(--text);
+      padding:10px 14px; border-radius:999px; font-size:14px; font-weight:700; cursor:pointer;
+      transition:background .15s, border-color .15s, color .15s;
     }
+    .chip:hover{ border-color:var(--accent); }
+    .chip[aria-pressed="true"]{ background:var(--accent-soft); border-color:var(--accent); color:var(--accent); }
+    .chip small{ font-weight:600; opacity:.75; margin-left:4px; }
+
+    .toggle{ display:flex; align-items:center; gap:10px; font-size:14px; font-weight:650; cursor:pointer; user-select:none; }
+    .toggle input{ width:18px; height:18px; accent-color:var(--accent); }
+
     .btn{
-      cursor:pointer;
-      user-select:none;
-      font-weight:750;
-      transition: transform .04s ease, background .15s ease;
-      font-size:14px;
+      border:1px solid var(--border); background:var(--card); color:var(--text);
+      padding:12px 18px; border-radius:14px; font-size:15px; font-weight:800; cursor:pointer;
+      transition:transform .05s, background .15s, opacity .15s;
     }
-    .btn:active{ transform: translateY(1px); }
-    .btn:hover{ background: rgba(255,255,255,1); }
+    .btn:active{ transform:translateY(1px); }
+    .btn.primary{ background:var(--accent); border-color:var(--accent); color:#fff; }
+    .btn.primary:hover{ filter:brightness(1.06); }
+    .btn:disabled{ opacity:.45; cursor:not-allowed; }
+    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .row.end{ justify-content:flex-end; }
+    .best{ color:var(--muted); font-size:13px; font-weight:650; margin-right:auto; }
 
-    main{
-      max-width:1200px;
-      margin:0 auto;
-      padding:0 18px 34px;
+    /* ---------- Quiz ---------- */
+    .quiz-top{ display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+    .progress{ flex:1; height:8px; background:var(--accent-soft); border-radius:999px; overflow:hidden; }
+    .progress > div{ height:100%; width:0; background:var(--accent); border-radius:999px; transition:width .3s ease; }
+    .counter{ font-size:13px; font-weight:800; color:var(--muted); min-width:52px; text-align:right; }
+    .stats{ display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+    .stat{ font-size:13px; font-weight:750; padding:6px 10px; border-radius:999px; border:1px solid var(--border); color:var(--muted); }
+    .stat b{ color:var(--text); }
+    .icon-btn{
+      border:1px solid var(--border); background:transparent; color:var(--muted);
+      border-radius:10px; padding:6px 10px; font-size:13px; font-weight:700; cursor:pointer;
     }
-    .grid{
-      display:grid;
-      grid-template-columns: repeat( auto-fit, minmax(300px, 1fr) );
-      gap:16px;
-    }
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.92));
-      border:1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding:18px 18px 16px;
-      position:relative;
-      overflow:hidden;
-      cursor:pointer;
-      text-align:left;
-    }
-    .card:focus{
-      outline:3px solid rgba(120,160,255,.45);
-      outline-offset:2px;
-    }
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:7px 12px;
-      border-radius:999px;
-      font-size:13px;
-      color:var(--muted);
-      border:1px solid var(--border);
-      background: rgba(18,19,26,.03);
-      font-weight:700;
-    }
+    .icon-btn:hover{ color:var(--text); }
 
-    /* BIG typography */
-    .kanjit{
-      margin:14px 0 10px;
-      font-size: 72px;     /* VERY BIG kanji */
-      font-weight:900;
-      letter-spacing: .5px;
-      line-height:1.05;
+    .prompt-label{ text-align:center; color:var(--muted); font-size:13px; font-weight:750; margin:4px 0 0; }
+    .prompt{
+      text-align:center; margin:10px 0 22px; min-height:140px;
+      display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px;
     }
-    ruby{ ruby-position: over; }
-    rt{
-      font-size: 22px;    /* BIG furigana */
-      color: var(--muted);
-      font-weight: 800;
-      letter-spacing:.2px;
-    }
-    .romaji{
-      margin:0;
-      font-size:28px;     /* BIG romaji */
-      font-weight:900;
-      letter-spacing:.3px;
-      color:#202334;
-    }
-    .meaning{
-      margin:10px 0 0;
-      font-size:22px;     /* BIG meaning */
-      font-weight:800;
-      color:#2a2e42;
-    }
-    .hint{
-      margin:12px 0 0;
-      color:var(--muted);
-      font-size:13px;
-      font-weight:700;
-    }
+    .prompt .jp{ font-size:clamp(56px, 16vw, 96px); font-weight:900; line-height:1.1; letter-spacing:.5px; }
+    .prompt .en{ font-size:clamp(28px, 7vw, 40px); font-weight:850; }
+    .prompt .reveal{ font-size:18px; font-weight:750; color:var(--muted); min-height:24px; }
+    ruby{ ruby-position:over; }
+    rt{ font-size:.28em; color:var(--muted); font-weight:800; }
 
-    .footer{
-      max-width:1200px;
-      margin:0 auto;
-      padding:0 18px 18px;
-      color:var(--muted);
-      font-size:12px;
+    .options{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    @media (max-width:480px){ .options{ grid-template-columns:1fr; } }
+    .opt{
+      position:relative; text-align:left;
+      border:2px solid var(--border); background:var(--card); color:var(--text);
+      border-radius:16px; padding:16px 16px 16px 48px; min-height:64px;
+      font-size:18px; font-weight:750; cursor:pointer;
+      transition:border-color .15s, background .15s, transform .05s;
     }
-    .toast{
-      position:fixed;
-      left:50%;
-      bottom:18px;
-      transform:translateX(-50%);
-      background: rgba(255,255,255,.95);
-      border:1px solid var(--border);
-      color:var(--text);
-      padding:10px 12px;
-      border-radius: 14px;
-      box-shadow: var(--shadow);
-      opacity:0;
-      pointer-events:none;
-      transition: opacity .18s ease, transform .18s ease;
-      font-size:13px;
-      font-weight:700;
+    .opt.jp-opt{ font-size:24px; }
+    .opt:hover:not(:disabled){ border-color:var(--accent); }
+    .opt:active:not(:disabled){ transform:translateY(1px); }
+    .opt .key{
+      position:absolute; left:14px; top:50%; transform:translateY(-50%);
+      width:24px; height:24px; border-radius:7px; display:grid; place-items:center;
+      font-size:12px; font-weight:850; color:var(--muted); border:1px solid var(--border);
     }
-    .toast.show{
-      opacity:1;
-      transform:translateX(-50%) translateY(-2px);
+    .opt:disabled{ cursor:default; }
+    .opt.correct{ border-color:var(--good); background:var(--good-soft); }
+    .opt.correct .key{ border-color:var(--good); color:var(--good); }
+    .opt.wrong{ border-color:var(--bad); background:var(--bad-soft); animation:shake .3s; }
+    .opt.wrong .key{ border-color:var(--bad); color:var(--bad); }
+    .opt.dim{ opacity:.5; }
+    @keyframes shake{ 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+
+    .feedback{
+      margin-top:16px; padding:14px 16px; border-radius:14px; font-weight:750; font-size:15px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
     }
-    .empty{
-      padding:24px 0;
-      color:var(--muted);
-      font-size:14px;
-      font-weight:700;
+    .feedback.good{ background:var(--good-soft); color:var(--good); }
+    .feedback.bad{ background:var(--bad-soft); color:var(--bad); }
+    .feedback .detail{ color:var(--text); font-weight:650; font-size:14px; margin-top:2px; }
+
+    /* ---------- Results ---------- */
+    .score-ring{ width:150px; height:150px; margin:6px auto 12px; position:relative; }
+    .score-ring svg{ transform:rotate(-90deg); }
+    .score-ring .pct{ position:absolute; inset:0; display:grid; place-items:center; font-size:34px; font-weight:900; }
+    .result-title{ text-align:center; font-size:22px; font-weight:850; margin:0; }
+    .result-sub{ text-align:center; color:var(--muted); font-weight:650; margin:6px 0 20px; }
+    .missed{ list-style:none; padding:0; margin:0 0 20px; display:grid; gap:8px; }
+    .missed li{
+      display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;
+      padding:12px 14px; border:1px solid var(--border); border-radius:14px;
     }
+    .missed .k{ font-size:24px; font-weight:900; }
+    .missed .r{ color:var(--muted); font-weight:700; }
+    .missed .m{ margin-left:auto; font-weight:750; }
+
+    /* ---------- Study ---------- */
+    .study-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:10px; margin-bottom:18px; }
+    .flash{
+      border:1px solid var(--border); background:var(--card); color:var(--text);
+      border-radius:16px; padding:14px; text-align:center; cursor:pointer; min-height:130px;
+      display:flex; flex-direction:column; justify-content:center; gap:6px;
+    }
+    .flash:hover{ border-color:var(--accent); }
+    .flash .k{ font-size:34px; font-weight:900; }
+    .flash .r{ font-size:14px; color:var(--muted); font-weight:700; }
+    .flash .m{ font-size:15px; font-weight:750; }
+    .flash:not(.open) .r, .flash:not(.open) .m{ visibility:hidden; }
+
+    footer{ text-align:center; color:var(--muted); font-size:12px; margin-top:22px; }
+    footer a{ color:var(--accent); font-weight:800; text-decoration:none; }
+    .kbd-hint{ text-align:center; color:var(--muted); font-size:12px; margin-top:14px; font-weight:600; }
+    @media (hover:none){ .kbd-hint{ display:none; } .opt .key{ display:none; } .opt{ padding-left:16px; } }
   </style>
 </head>
 <body>
-  <header>
-    <h1>JLPT N5 Vocabulary Cards</h1>
-    <p class="sub">Click a card to flip (show/hide romaji + meaning). Search works on kanji, kana, romaji, and English.</p>
-  </header>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">語</div>
+        <div>
+          <h1>JLPT N5 Vocab Quiz</h1>
+          <p class="sub">Practice kanji, readings and meanings</p>
+        </div>
+      </div>
+      <button id="homeBtn" class="icon-btn hidden" type="button">✕ Quit</button>
+    </header>
 
-  <div class="toolbar">
-    <input id="search" class="input" type="search" placeholder="Search: 私 / わたし / watashi / mother ..." autocomplete="off" />
-    <button id="reset" class="btn" type="button">Reset</button>
-    <button id="revealAll" class="btn" type="button">Reveal all</button>
-    <button id="hideAll" class="btn" type="button">Hide all</button>
+    <!-- Setup screen -->
+    <section id="setup" class="panel">
+      <div class="group">
+        <p class="section-label">Word set</p>
+        <div class="chips" id="deckChips"></div>
+      </div>
+      <div class="group">
+        <p class="section-label">Question type</p>
+        <div class="chips" id="modeChips"></div>
+      </div>
+      <div class="group">
+        <p class="section-label">Number of questions</p>
+        <div class="chips" id="countChips"></div>
+      </div>
+      <div class="group">
+        <label class="toggle"><input type="checkbox" id="furiganaToggle" /> Show furigana on questions</label>
+      </div>
+      <div class="row end">
+        <span class="best" id="bestScore"></span>
+        <button id="studyBtn" class="btn" type="button">Study cards</button>
+        <button id="startBtn" class="btn primary" type="button">Start quiz →</button>
+      </div>
+    </section>
+
+    <!-- Quiz screen -->
+    <section id="quiz" class="panel hidden">
+      <div class="quiz-top">
+        <div class="progress"><div id="progressBar"></div></div>
+        <div class="counter" id="counter">1 / 10</div>
+      </div>
+      <div class="stats">
+        <span class="stat">Score <b id="scoreVal">0</b></span>
+        <span class="stat">Streak <b id="streakVal">0</b> 🔥</span>
+        <button class="icon-btn" id="speakBtn" type="button" title="Hear pronunciation">🔊 Listen</button>
+      </div>
+      <p class="prompt-label" id="promptLabel"></p>
+      <div class="prompt" id="prompt"></div>
+      <div class="options" id="options"></div>
+      <div id="feedback" class="feedback hidden"></div>
+      <p class="kbd-hint">Keys: 1–4 to answer · Enter for next</p>
+    </section>
+
+    <!-- Results screen -->
+    <section id="results" class="panel hidden">
+      <div class="score-ring">
+        <svg width="150" height="150" viewBox="0 0 150 150">
+          <circle cx="75" cy="75" r="64" fill="none" stroke="var(--accent-soft)" stroke-width="12" />
+          <circle id="ringFg" cx="75" cy="75" r="64" fill="none" stroke="var(--accent)" stroke-width="12"
+                  stroke-linecap="round" stroke-dasharray="402.1" stroke-dashoffset="402.1"
+                  style="transition:stroke-dashoffset .8s ease" />
+        </svg>
+        <div class="pct" id="pct">0%</div>
+      </div>
+      <p class="result-title" id="resultTitle"></p>
+      <p class="result-sub" id="resultSub"></p>
+      <div id="missedWrap">
+        <p class="section-label">Words to review</p>
+        <ul class="missed" id="missedList"></ul>
+      </div>
+      <div class="row end">
+        <button id="retryMissedBtn" class="btn" type="button">Retry missed</button>
+        <button id="againBtn" class="btn" type="button">Same settings</button>
+        <button id="newBtn" class="btn primary" type="button">New quiz</button>
+      </div>
+    </section>
+
+    <!-- Study screen -->
+    <section id="study" class="panel hidden">
+      <p class="section-label">Tap a card to reveal reading + meaning</p>
+      <div class="study-grid" id="studyGrid"></div>
+      <div class="row end">
+        <button id="studyBackBtn" class="btn" type="button">← Back</button>
+        <button id="studyStartBtn" class="btn primary" type="button">Quiz these →</button>
+      </div>
+    </section>
+
+    <footer>
+      Follow <a href="https://www.facebook.com/profile.php?id=61586097327580">NIICHI</a>
+    </footer>
   </div>
-
-  <main>
-    <div id="grid" class="grid" aria-live="polite"></div>
-    <div id="empty" class="empty" style="display:none;">No matches. Your search is too narrow.</div>
-  </main>
-
-  <div class="footer">
-    Follow <strong> <a href="https://www.facebook.com/profile.php?id=61586097327580">NIICHI</a></strong>
-  </div>
-
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script>
-    const WORDS = [
-      { kanji: "私",  kana: "わたし", romaji: "watashi", meaning: "I, me" },
-      { kanji: "あなた", kana: "あなた", romaji: "anata", meaning: "you" },
-      { kanji: "友達", kana: "ともだち", romaji: "tomodachi", meaning: "friend" },
-      { kanji: "先生", kana: "せんせい", romaji: "sensei", meaning: "teacher" },
-      { kanji: "学生", kana: "がくせい", romaji: "gakusei", meaning: "student" },
-      { kanji: "会社員", kana: "かいしゃいん", romaji: "kaishain", meaning: "company employee" },
-      { kanji: "仕事", kana: "しごと", romaji: "shigoto", meaning: "work, job" },
-      { kanji: "家族", kana: "かぞく", romaji: "kazoku", meaning: "family" },
-      { kanji: "母", kana: "はは", romaji: "haha", meaning: "(my) mother" },
-      { kanji: "父", kana: "ちち", romaji: "chichi", meaning: "(my) father" },
-      { kanji: "お母さん", kana: "おかあさん", romaji: "okāsan", meaning: "mother (polite)" },
-      { kanji: "お父さん", kana: "おとうさん", romaji: "otōsan", meaning: "father (polite)" },
-    ];
+    const DECKS = {
+      people: {
+        name: "People & Family",
+        words: [
+          { kanji:"私",     kana:"わたし",       romaji:"watashi",    meaning:"I, me" },
+          { kanji:"あなた", kana:"あなた",       romaji:"anata",      meaning:"you" },
+          { kanji:"友達",   kana:"ともだち",     romaji:"tomodachi",  meaning:"friend" },
+          { kanji:"先生",   kana:"せんせい",     romaji:"sensei",     meaning:"teacher" },
+          { kanji:"学生",   kana:"がくせい",     romaji:"gakusei",    meaning:"student" },
+          { kanji:"会社員", kana:"かいしゃいん", romaji:"kaishain",   meaning:"company employee" },
+          { kanji:"仕事",   kana:"しごと",       romaji:"shigoto",    meaning:"work, job" },
+          { kanji:"家族",   kana:"かぞく",       romaji:"kazoku",     meaning:"family" },
+          { kanji:"母",     kana:"はは",         romaji:"haha",       meaning:"(my) mother" },
+          { kanji:"父",     kana:"ちち",         romaji:"chichi",     meaning:"(my) father" },
+          { kanji:"お母さん", kana:"おかあさん", romaji:"okāsan",     meaning:"mother (polite)" },
+          { kanji:"お父さん", kana:"おとうさん", romaji:"otōsan",     meaning:"father (polite)" },
+        ],
+      },
+      time: {
+        name: "Time",
+        words: [
+          { kanji:"今日",   kana:"きょう",       romaji:"kyō",        meaning:"today" },
+          { kanji:"明日",   kana:"あした",       romaji:"ashita",     meaning:"tomorrow" },
+          { kanji:"昨日",   kana:"きのう",       romaji:"kinō",       meaning:"yesterday" },
+          { kanji:"今",     kana:"いま",         romaji:"ima",        meaning:"now" },
+          { kanji:"朝",     kana:"あさ",         romaji:"asa",        meaning:"morning" },
+          { kanji:"昼",     kana:"ひる",         romaji:"hiru",       meaning:"daytime / noon" },
+          { kanji:"夜",     kana:"よる",         romaji:"yoru",       meaning:"night" },
+          { kanji:"時間",   kana:"じかん",       romaji:"jikan",      meaning:"time / hour" },
+          { kanji:"毎日",   kana:"まいにち",     romaji:"mainichi",   meaning:"every day" },
+          { kanji:"今週",   kana:"こんしゅう",   romaji:"konshū",     meaning:"this week" },
+          { kanji:"来週",   kana:"らいしゅう",   romaji:"raishū",     meaning:"next week" },
+          { kanji:"先週",   kana:"せんしゅう",   romaji:"senshū",     meaning:"last week" },
+        ],
+      },
+      places: {
+        name: "Places",
+        words: [
+          { kanji:"家",     kana:"いえ",         romaji:"ie",         meaning:"home / house" },
+          { kanji:"学校",   kana:"がっこう",     romaji:"gakkō",      meaning:"school" },
+          { kanji:"会社",   kana:"かいしゃ",     romaji:"kaisha",     meaning:"company" },
+          { kanji:"駅",     kana:"えき",         romaji:"eki",        meaning:"station" },
+          { kanji:"店",     kana:"みせ",         romaji:"mise",       meaning:"shop / store" },
+          { kanji:"病院",   kana:"びょういん",   romaji:"byōin",      meaning:"hospital" },
+          { kanji:"銀行",   kana:"ぎんこう",     romaji:"ginkō",      meaning:"bank" },
+          { kanji:"郵便局", kana:"ゆうびんきょく", romaji:"yūbinkyoku", meaning:"post office" },
+          { kanji:"図書館", kana:"としょかん",   romaji:"toshokan",   meaning:"library" },
+          { kanji:"公園",   kana:"こうえん",     romaji:"kōen",       meaning:"park" },
+        ],
+      },
+    };
+    const ALL_WORDS = Object.values(DECKS).flatMap(d => d.words);
 
-    const revealed = new Set();
+    const MODES = {
+      meaning: { name: "Kanji → Meaning",   label: "What does this mean?" },
+      reading: { name: "Kanji → Reading",   label: "How do you read this?" },
+      reverse: { name: "Meaning → Japanese", label: "Which word means…" },
+      mixed:   { name: "Mixed",             label: "" },
+    };
+    const COUNTS = [10, 20, 0]; // 0 = all
 
-    const gridEl = document.getElementById("grid");
-    const emptyEl = document.getElementById("empty");
-    const searchEl = document.getElementById("search");
-    const toastEl = document.getElementById("toast");
+    const settings = { decks: new Set(["people", "time", "places"]), mode: "meaning", count: 10, furigana: false };
+    loadSettings();
 
-    function normalize(s){
-      return (s || "").toString().trim().toLowerCase();
+    const $ = id => document.getElementById(id);
+    const screens = ["setup", "quiz", "results", "study"];
+    let state = null;
+
+    function store(key, value){ try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){} }
+    function recall(key){ try{ return JSON.parse(localStorage.getItem(key)); }catch(e){ return null; } }
+
+    function loadSettings(){
+      const s = recall("n5quiz.settings");
+      if(!s) return;
+      if(Array.isArray(s.decks)){
+        const valid = s.decks.filter(d => DECKS[d]);
+        if(valid.length) settings.decks = new Set(valid);
+      }
+      if(MODES[s.mode]) settings.mode = s.mode;
+      if(COUNTS.includes(s.count)) settings.count = s.count;
+      settings.furigana = !!s.furigana;
     }
-
-    function matches(word, q){
-      if(!q) return true;
-      const hay = [word.kanji, word.kana, word.romaji, word.meaning].join(" ").toLowerCase();
-      return hay.includes(q);
+    function saveSettings(){
+      store("n5quiz.settings", { decks:[...settings.decks], mode:settings.mode, count:settings.count, furigana:settings.furigana });
     }
 
     function escapeHtml(str){
-      return String(str)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
+      return String(str).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
     }
-
-    function rubyFor(kanji, kana){
-      const hasKanji = /[\u4E00-\u9FFF]/.test(kanji);
-      if(!hasKanji || kanji === kana){
-        return `<span>${escapeHtml(kanji)}</span>`;
+    function hasKanji(s){ return /[一-鿿]/.test(s); }
+    function jp(word, furigana){
+      if(!furigana || !hasKanji(word.kanji)) return escapeHtml(word.kanji);
+      return `<ruby>${escapeHtml(word.kanji)}<rt>${escapeHtml(word.kana)}</rt></ruby>`;
+    }
+    function shuffle(arr){
+      const a = arr.slice();
+      for(let i = a.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
       }
-      return `<ruby>${escapeHtml(kanji)}<rt>${escapeHtml(kana)}</rt></ruby>`;
+      return a;
+    }
+    function show(name){
+      screens.forEach(s => $(s).classList.toggle("hidden", s !== name));
+      $("homeBtn").classList.toggle("hidden", name === "setup");
+      window.scrollTo({ top: 0 });
+    }
+    function selectedWords(){
+      return [...settings.decks].flatMap(d => DECKS[d].words);
     }
 
-    function render(){
-      const q = normalize(searchEl.value);
-      const filtered = WORDS.map((w,i)=>({...w,i})).filter(x => matches(x, q));
+    /* ---------- Setup ---------- */
+    function renderSetup(){
+      $("deckChips").innerHTML = Object.entries(DECKS).map(([id, d]) =>
+        `<button type="button" class="chip" data-deck="${id}" aria-pressed="${settings.decks.has(id)}">${escapeHtml(d.name)}<small>${d.words.length}</small></button>`
+      ).join("");
+      $("modeChips").innerHTML = Object.entries(MODES).map(([id, m]) =>
+        `<button type="button" class="chip" data-mode="${id}" aria-pressed="${settings.mode === id}">${m.name}</button>`
+      ).join("");
+      const total = selectedWords().length;
+      $("countChips").innerHTML = COUNTS.map(c =>
+        `<button type="button" class="chip" data-count="${c}" aria-pressed="${settings.count === c}">${c === 0 ? `All<small>${total}</small>` : c}</button>`
+      ).join("");
+      $("furiganaToggle").checked = settings.furigana;
+      $("startBtn").disabled = total < 4;
+      $("studyBtn").disabled = total === 0;
 
-      gridEl.innerHTML = "";
-      emptyEl.style.display = filtered.length ? "none" : "block";
+      const best = recall("n5quiz.best");
+      $("bestScore").textContent = best ? `Best: ${best.pct}% (${best.correct}/${best.total})` : "";
+    }
 
-      filtered.forEach(item => {
-        const isRevealed = revealed.has(item.i);
+    $("deckChips").addEventListener("click", e => {
+      const id = e.target.closest("[data-deck]")?.dataset.deck;
+      if(!id) return;
+      if(settings.decks.has(id)){
+        if(settings.decks.size > 1) settings.decks.delete(id);
+      } else settings.decks.add(id);
+      saveSettings(); renderSetup();
+    });
+    $("modeChips").addEventListener("click", e => {
+      const id = e.target.closest("[data-mode]")?.dataset.mode;
+      if(!id) return;
+      settings.mode = id; saveSettings(); renderSetup();
+    });
+    $("countChips").addEventListener("click", e => {
+      const c = e.target.closest("[data-count]")?.dataset.count;
+      if(c === undefined) return;
+      settings.count = Number(c); saveSettings(); renderSetup();
+    });
+    $("furiganaToggle").addEventListener("change", e => { settings.furigana = e.target.checked; saveSettings(); });
 
-        const card = document.createElement("button");
-        card.type = "button";
-        card.className = "card";
-        card.setAttribute("aria-pressed", String(isRevealed));
-        card.setAttribute("title", "Click to flip");
+    /* ---------- Quiz ---------- */
+    function startQuiz(words, { retry = false, pool = words } = {}){
+      words = shuffle(words);
+      if(settings.count && !retry) words = words.slice(0, settings.count);
+      const modes = ["meaning", "reading", "reverse"];
+      state = {
+        pool,
+        questions: words.map(w => ({ word: w, mode: settings.mode === "mixed" ? modes[Math.floor(Math.random() * 3)] : settings.mode })),
+        index: 0, score: 0, streak: 0, bestStreak: 0, missed: [], answered: false, retry,
+      };
+      show("quiz");
+      renderQuestion();
+    }
 
-        card.innerHTML = `
-          <div class="pill">N5 • Tap to flip</div>
-          <div class="kanjit">${rubyFor(item.kanji, item.kana)}</div>
-          ${isRevealed ? `
-            <p class="romaji">${escapeHtml(item.romaji)}</p>
-            <p class="meaning">${escapeHtml(item.meaning)}</p>
-            <p class="hint">Click again to hide.</p>
-          ` : `
-            <p class="romaji" style="visibility:hidden;">placeholder</p>
-            <p class="meaning" style="visibility:hidden;">placeholder</p>
-            <p class="hint">Click to reveal romaji + meaning.</p>
-          `}
-        `;
+    function answerText(word, mode){
+      if(mode === "meaning") return word.meaning;
+      if(mode === "reading") return word.kana;
+      return word.kanji;
+    }
 
-        card.addEventListener("click", () => {
-          if (revealed.has(item.i)) {
-            revealed.delete(item.i);
-            toast("Hidden");
-          } else {
-            revealed.add(item.i);
-            toast("Revealed");
-          }
-          render();
-        });
+    function buildOptions(word, mode){
+      const correct = answerText(word, mode);
+      // Prefer distractors from the chosen sets; top up from all words if the pool is small.
+      const seen = new Set([correct]);
+      const distractors = [];
+      for(const w of [...shuffle(state.pool), ...shuffle(ALL_WORDS)]){
+        const t = answerText(w, mode);
+        if(seen.has(t)) continue;
+        seen.add(t);
+        distractors.push(t);
+        if(distractors.length === 3) break;
+      }
+      return shuffle([correct, ...distractors]);
+    }
 
-        gridEl.appendChild(card);
+    function renderQuestion(){
+      const q = state.questions[state.index];
+      const total = state.questions.length;
+      state.answered = false;
+      q.options = buildOptions(q.word, q.mode);
+
+      $("counter").textContent = `${state.index + 1} / ${total}`;
+      $("progressBar").style.width = `${(state.index / total) * 100}%`;
+      $("scoreVal").textContent = state.score;
+      $("streakVal").textContent = state.streak;
+      $("promptLabel").textContent = MODES[q.mode].label;
+
+      if(q.mode === "reverse"){
+        $("prompt").innerHTML = `<div class="en">${escapeHtml(q.word.meaning)}</div><div class="reveal" id="reveal"></div>`;
+      } else {
+        // In reading mode furigana would give the answer away.
+        const furi = settings.furigana && q.mode !== "reading";
+        $("prompt").innerHTML = `<div class="jp">${jp(q.word, furi)}</div><div class="reveal" id="reveal"></div>`;
+      }
+
+      const jpOpts = q.mode !== "meaning";
+      $("options").innerHTML = q.options.map((t, i) =>
+        `<button type="button" class="opt${jpOpts ? " jp-opt" : ""}" data-i="${i}"><span class="key">${i + 1}</span>${escapeHtml(t)}</button>`
+      ).join("");
+      $("feedback").className = "feedback hidden";
+      $("speakBtn").classList.toggle("hidden", !canSpeak() || q.mode === "reading");
+    }
+
+    function choose(i){
+      if(state.answered) return;
+      const q = state.questions[state.index];
+      if(i < 0 || i >= q.options.length) return;
+      state.answered = true;
+
+      const correct = answerText(q.word, q.mode);
+      const right = q.options[i] === correct;
+      const buttons = [...$("options").children];
+      buttons.forEach((b, j) => {
+        b.disabled = true;
+        if(q.options[j] === correct) b.classList.add("correct");
+        else if(j === i) b.classList.add("wrong");
+        else b.classList.add("dim");
       });
+
+      if(right){
+        state.score++; state.streak++;
+        state.bestStreak = Math.max(state.bestStreak, state.streak);
+      } else {
+        state.streak = 0;
+        state.missed.push(q.word);
+      }
+      $("scoreVal").textContent = state.score;
+      $("streakVal").textContent = state.streak;
+
+      // Reveal the full word details after answering.
+      $("reveal").innerHTML = q.mode === "reverse"
+        ? `<span style="font-size:40px;color:var(--text);font-weight:900">${jp(q.word, true)}</span>`
+        : `${escapeHtml(q.word.kana)} · ${escapeHtml(q.word.romaji)}`;
+      if(q.mode !== "reverse"){
+        $("prompt").querySelector(".jp").innerHTML = jp(q.word, true);
+      }
+
+      const last = state.index === state.questions.length - 1;
+      const praise = ["Correct!", "Nice!", "すごい!", "Great!", "その通り!"];
+      const fb = $("feedback");
+      fb.className = `feedback ${right ? "good" : "bad"}`;
+      fb.innerHTML = `
+        <div>
+          <div>${right ? (state.streak >= 3 ? `${state.streak} in a row! 🔥` : praise[Math.floor(Math.random() * praise.length)]) : "Not quite"}</div>
+          <div class="detail">${escapeHtml(q.word.kanji)} (${escapeHtml(q.word.kana)}, ${escapeHtml(q.word.romaji)}) = ${escapeHtml(q.word.meaning)}</div>
+        </div>
+        <button type="button" class="btn primary" id="nextBtn">${last ? "See results" : "Next →"}</button>`;
+      $("nextBtn").addEventListener("click", next);
+      $("nextBtn").focus({ preventScroll: true });
+      $("progressBar").style.width = `${((state.index + 1) / state.questions.length) * 100}%`;
     }
 
-    let toastTimer = null;
-    function toast(msg){
-      clearTimeout(toastTimer);
-      toastEl.textContent = msg;
-      toastEl.classList.add("show");
-      toastTimer = setTimeout(() => toastEl.classList.remove("show"), 650);
+    function next(){
+      if(!state.answered) return;
+      if(state.index < state.questions.length - 1){
+        state.index++;
+        renderQuestion();
+      } else finish();
     }
 
-    document.getElementById("reset").addEventListener("click", () => {
-      searchEl.value = "";
-      revealed.clear();
-      toast("Reset");
-      render();
-      searchEl.focus();
+    $("options").addEventListener("click", e => {
+      const b = e.target.closest(".opt");
+      if(b) choose(Number(b.dataset.i));
     });
 
-    document.getElementById("revealAll").addEventListener("click", () => {
-      WORDS.forEach((_, i) => revealed.add(i));
-      toast("All revealed");
-      render();
+    document.addEventListener("keydown", e => {
+      if($("quiz").classList.contains("hidden")) return;
+      if(e.key >= "1" && e.key <= "4"){ choose(Number(e.key) - 1); e.preventDefault(); }
+      else if(e.key === "Enter" && state.answered && document.activeElement?.id !== "nextBtn"){ next(); e.preventDefault(); }
     });
 
-    document.getElementById("hideAll").addEventListener("click", () => {
-      revealed.clear();
-      toast("All hidden");
-      render();
+    function canSpeak(){ return "speechSynthesis" in window; }
+    $("speakBtn").addEventListener("click", () => {
+      if(!canSpeak() || !state) return;
+      const u = new SpeechSynthesisUtterance(state.questions[state.index].word.kana);
+      u.lang = "ja-JP"; u.rate = 0.85;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
     });
 
-    searchEl.addEventListener("input", render);
-    render();
+    /* ---------- Results ---------- */
+    function finish(){
+      const total = state.questions.length;
+      const pct = Math.round((state.score / total) * 100);
+      show("results");
+
+      $("pct").textContent = `${pct}%`;
+      const ring = $("ringFg");
+      ring.style.stroke = pct >= 80 ? "var(--good)" : pct >= 50 ? "var(--accent)" : "var(--bad)";
+      ring.style.strokeDashoffset = 402.1;
+      requestAnimationFrame(() => requestAnimationFrame(() => { ring.style.strokeDashoffset = 402.1 * (1 - pct / 100); }));
+
+      $("resultTitle").textContent =
+        pct === 100 ? "Perfect! 完璧！" : pct >= 80 ? "Great job! よくできました" : pct >= 50 ? "Good effort! がんばって" : "Keep practicing! ファイト!";
+      $("resultSub").textContent = `${state.score} of ${total} correct · best streak ${state.bestStreak}`;
+
+      const uniqueMissed = [...new Map(state.missed.map(w => [w.kanji, w])).values()];
+      state.missedWords = uniqueMissed;
+      $("missedWrap").classList.toggle("hidden", uniqueMissed.length === 0);
+      $("missedList").innerHTML = uniqueMissed.map(w =>
+        `<li><span class="k">${escapeHtml(w.kanji)}</span><span class="r">${escapeHtml(w.kana)} · ${escapeHtml(w.romaji)}</span><span class="m">${escapeHtml(w.meaning)}</span></li>`
+      ).join("");
+      $("retryMissedBtn").classList.toggle("hidden", uniqueMissed.length === 0);
+
+      if(!state.retry && total >= 10){
+        const best = recall("n5quiz.best");
+        if(!best || pct > best.pct || (pct === best.pct && total > best.total)){
+          store("n5quiz.best", { pct, correct: state.score, total });
+        }
+      }
+    }
+
+    $("retryMissedBtn").addEventListener("click", () => {
+      // Keep distractors drawn from the original sets.
+      startQuiz(state.missedWords, { retry: true, pool: state.pool });
+    });
+    $("againBtn").addEventListener("click", () => startQuiz(selectedWords()));
+    $("newBtn").addEventListener("click", goHome);
+
+    /* ---------- Study ---------- */
+    function renderStudy(){
+      $("studyGrid").innerHTML = selectedWords().map(w =>
+        `<button type="button" class="flash"><span class="k">${escapeHtml(w.kanji)}</span><span class="r">${escapeHtml(w.kana)} · ${escapeHtml(w.romaji)}</span><span class="m">${escapeHtml(w.meaning)}</span></button>`
+      ).join("");
+      show("study");
+    }
+    $("studyGrid").addEventListener("click", e => e.target.closest(".flash")?.classList.toggle("open"));
+    $("studyBtn").addEventListener("click", renderStudy);
+    $("studyBackBtn").addEventListener("click", goHome);
+    $("studyStartBtn").addEventListener("click", () => startQuiz(selectedWords()));
+
+    /* ---------- Navigation ---------- */
+    function goHome(){
+      if(canSpeak()) speechSynthesis.cancel();
+      renderSetup();
+      show("setup");
+    }
+    $("startBtn").addEventListener("click", () => startQuiz(selectedWords()));
+    $("homeBtn").addEventListener("click", () => {
+      if(!$("quiz").classList.contains("hidden") && state && state.index > 0 && !confirm("Quit this quiz?")) return;
+      goHome();
+    });
+
+    renderSetup();
   </script>
 </body>
 </html>
